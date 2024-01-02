@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>Auto Shop</title>
+    <link href="https://fonts.googleapis.com/css?family=Lato:100,300,300i,400,700" rel="stylesheet">
+    <link rel="stylesheet" href="../static/css/view.css">
+    <link rel="icon" href="../static/images/logo.png" type="image/jpg">
+  </head>
+  <body>
+    <header>
+        <img alt="DB" class="logo" src="../static/images/logo.png">
+        <h1 id="logo-header">Auto Shop</h1>
+        <a href="{{url_for('home')}}" id="home-btn" class="button">Home</a>
+    </header>
+    <h1 class="tagline">Order Details</h1>
+
+    <form action="{{url_for('viewOrder')}}" class="viewOrder-form" method="post">
+        <input type="text" name="orderId" id="orderId" placeholder="Enter Order ID" required>
+        <input type="submit" value="Search">
+    </form>
+  </body>
+</html>

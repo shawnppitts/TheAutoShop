@@ -1,0 +1,80 @@
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans&family=Shrikhand&display=swap');
+
+body{
+  margin: 0;
+  padding: 0;
+  font-family: "Open Sans";
+  font-weight: 100;
+  background: url(../images/background.jpg) no-repeat center fixed;
+  height: 100%;
+  -webkit-background-size:cover;
+  -moz-background-size:cover;
+  -o-background-size:cover;
+  background-size:cover;  
+}
+
+.logo{
+  float: left;
+  width: 7.5%;
+  height: 7.5%;
+  margin-top: 10px;
+  margin-left:10px;
+}
+
+h1 {
+  color:white;
+}
+
+header{
+  display: inline-block;
+}
+
+#logo-header {
+  font-size: 32px;
+  margin-top: 40px;
+  color: #c62828;
+  font-family: "Shrikhand" 
+}
+
+.tagline{
+  text-align: center;
+  font-size : 76px;
+  margin-top: 50px;
+}
+
+.btns-wrapper{
+  text-align: center;
+  position: relative;
+}
+
+.button {
+  background: none;
+  display: inline-block;
+  width: 200px;
+  padding: 20px;
+  color:#fff;
+  border: 1px solid #fff;
+  text-align: center;
+  font-size: 32px;
+  outline:none;
+  text-decoration:none;
+}
+
+
+.button:link,
+.button:visited
+{
+    padding: 10px 30px;
+    font-weight: 300;
+    text-decoration: none;
+    transition: background-color 0.3s,border 0.2s,color 0.2;
+}
+
+.button:hover,
+.button:active
+{
+    background-color: #ff1744;
+}
+
+

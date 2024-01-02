@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>Auto Shop</title>
+    <!-- <link rel="stylesheet" href="../static/css/grid.css"> -->
+    <link href="https://fonts.googleapis.com/css?family=Lato:100,300,300i,400,700" rel="stylesheet">
+    <link rel="stylesheet" href="../static/css/home.css">
+    <link rel="icon" href="../static/images/logo.png" type="image/jpg">
+  </head>
+  <body>
+    <header>
+        <img alt="DB" class="logo" src="../static/images/logo.png">
+        <h1 id="logo-header">Auto Shop</h1>
+    </header>
+
+    <h1 class="tagline">One Stop Car Shop</h1>
+
+    <div class="btns-wrapper">
+        <a href="{{url_for('order')}}" class="button">Order Car</a>
+        <br><br><br><br>
+        <a href="{{url_for('viewOrder')}}" class="button">View Order</a>
+    </div>
+  </body>
+</html>

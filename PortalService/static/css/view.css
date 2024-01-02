@@ -1,0 +1,111 @@
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans&family=Shrikhand&display=swap');
+
+body{
+  margin: 0;
+  padding: 0;
+  font-family: "Open Sans";
+  font-weight: 100;
+  background: #212121;
+  height: 100%;
+  width: 100%;
+}
+
+header{
+  display: inline-block;
+}
+
+#logo-header{
+  font-size: 32px;
+  margin-top: 40px;
+  color: #c62828;
+  font-family: "Shrikhand"
+}
+
+.logo{
+  float: left;
+  width: 7.5%;
+  height: 7.5%;
+  margin-top: 10px;
+  margin-left:10px;
+}
+
+#home-btn{
+  padding: 15px 50px;
+  border-radius: 1px;
+  background: none;
+  border: 1px solid #fff;
+}
+#home-btn:hover{
+  background: green;
+}
+
+.tagline{
+  font-family: "Shrikhand";
+  letter-spacing: 2px;
+  font-size: 38px;
+  color: white;
+  text-align:center;
+  padding-top: 20px;
+  padding-bottom: 20px;
+  margin: 0;
+}
+
+.viewOrder-form{
+    padding-top: 40px;
+    width: 60%;
+    margin: 0 475px;
+    display: inline-block;
+}
+
+input[type=text] {
+  width: 50%;
+  padding: 20px 10px;
+  border: 1px solid #ccc;
+}
+
+input[type=submit] {
+  width: 25%;
+  background: none;
+  color: white;
+  padding: 20px 10px;
+  border: 1px solid white;
+  cursor: pointer;
+}
+
+input[type=submit]:hover {
+  background-color: #c62828;
+}
+
+.button {
+  float:right;
+  display: inline-block;
+  color: white;
+  background-color:#4CAF50;
+  padding: 14px 20px;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  border-decoration: none;
+  margin-right: 20px;
+  margin-top : -75px;
+}
+
+.button:link,
+.button:visited
+{
+    display: inline-block;
+    padding: 10px 30px;
+    font-weight: 300;
+    text-decoration: none;
+    border-radius: 200px;
+    transition: background-color 0.2s,border 0.2s,color 0.2;
+}
+
+.button:hover,
+.button:active
+{
+    background-color: #45a049;
+}
+
+
