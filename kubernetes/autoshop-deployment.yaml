@@ -1,0 +1,267 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: app
+  labels:
+    name: app
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: portal
+  namespace: app
+spec:
+  selector:
+    app: portal
+  ports:
+    - name: tcp-portal
+      protocol: TCP
+      port: 5001
+      targetPort: 5001
+    - name: otlp-http
+      protocol: TCP
+      port: 4318
+      targetPort: otlp-http
+    - name: otlp
+      protocol: TCP
+      port: 4317
+      targetPort: otlp
+  type: LoadBalancer
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: portal
+  namespace: app
+spec:
+  replicas: 2  # Adjust the number of replicas as needed
+  selector:
+    matchLabels:
+      app: portal
+  template:
+    metadata:
+      labels:
+        app: portal 
+      annotations:
+        instrumentation.opentelemetry.io/inject-python: opentelemetry-operator-system/python-instrumentation    
+    spec:
+      containers:
+        - name: portal
+          image: shawnpitts/portal:latest
+          ports:
+            - containerPort: 5001
+          env:
+            - name: OM_GETORDER_URL
+              value: "/api/v1/orders/"
+            - name: OM_SUBMITORDER_URL
+              value: "/api/v1/orders/submitOrder"
+            - name: OM_PORT
+              value: "5003"
+            - name: OM_BASEURL
+              value: "orders.app.svc.cluster.local"
+            - name: PM_GETPRODUCT_URL
+              value: "/api/v1/products"
+            - name: PM_PORT
+              value: "5002"
+            - name: PM_BASEURL
+              value: "product.app.svc.cluster.local"
+            - name: OTEL_SERVICE_NAME
+              value: portal
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: http://logzio-monitoring-otel-collector.monitoring.svc.cluster.local:4318    
+
+# PRODUCT -----------------------------------------------------------------------
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: product
+  namespace: app
+spec:
+  selector:
+    app: product
+  ports:
+    - name: tcp-product
+      protocol: TCP
+      port: 5002
+      targetPort: 5002
+    - name: otlp-http
+      protocol: TCP
+      port: 4318
+      targetPort: otlp-http
+    - name: otlp
+      protocol: TCP
+      port: 4317
+      targetPort: otlp           
+  type: ClusterIP
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: product
+  namespace: app
+spec:
+  replicas: 2  # Adjust the number of replicas as needed
+  selector:
+    matchLabels:
+      app: product
+  template:
+    metadata:
+      labels:
+        app: product
+      annotations:
+        instrumentation.opentelemetry.io/inject-python: opentelemetry-operator-system/python-instrumentation
+    spec:
+      containers:
+        - name: product
+          image: shawnpitts/product:latest
+          ports:
+            - containerPort: 5002
+          env:
+            - name: MONGO_USERNAME
+              value: "admin"
+            - name: MONGO_PASSWORD
+              value: "0gDB80h5iYxTFMnF"
+            - name: MONGO_CLUSTER
+              value: "autoshop.8tnzb06.mongodb.net"
+            - name: OTEL_SERVICE_NAME
+              value: product
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: http://logzio-monitoring-otel-collector.monitoring.svc.cluster.local:4318                            
+
+# ORDER -----------------------------------------------------------------------
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: orders
+  namespace: app
+spec:
+  selector:
+    app: orders
+  ports:
+    - name: tcp-orders
+      protocol: TCP
+      port: 5003
+      targetPort: 5003
+    - name: otlp-http
+      protocol: TCP
+      port: 4318
+      targetPort: otlp-http
+    - name: otlp
+      protocol: TCP
+      port: 4317
+      targetPort: otlp        
+  type: ClusterIP
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: orders
+  namespace: app
+spec:
+  replicas: 2  # Adjust the number of replicas as needed
+  selector:
+    matchLabels:
+      app: orders
+  template:
+    metadata:
+      labels:
+        app: orders
+      annotations:
+        instrumentation.opentelemetry.io/inject-python: opentelemetry-operator-system/python-instrumentation      
+    spec:
+      containers:
+        - name: orders
+          image: shawnpitts/orders:latest
+          ports:
+            - containerPort: 5003
+          env:
+            - name: MONGO_USERNAME
+              value: "admin"
+            - name: MONGO_PASSWORD
+              value: "0gDB80h5iYxTFMnF"
+            - name: MONGO_CLUSTER
+              value: "autoshop.8tnzb06.mongodb.net"
+            - name: NG_URL
+              value: "/api/v1/email/sendMail"
+            - name: NG_PORT
+              value: "5004"
+            - name: NG_BASEURL
+              value: "notification-gateway.app.svc.cluster.local"
+            - name: OTEL_SERVICE_NAME
+              value: orders
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: http://logzio-monitoring-otel-collector.monitoring.svc.cluster.local:4318                            
+
+# Notification -----------------------------------------------------------------------
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: notification-gateway
+  namespace: app
+spec:
+  selector:
+    app: notification-gateway
+  ports:
+    - name: tcp-notification
+      protocol: TCP
+      port: 5004
+      targetPort: 5004
+    - name: otlp-http
+      protocol: TCP
+      port: 4318
+      targetPort: otlp-http
+    - name: otlp
+      protocol: TCP
+      port: 4317
+      targetPort: otlp      
+  type: ClusterIP
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: notification-gateway
+  namespace: app
+spec:
+  replicas: 2  # Adjust the number of replicas as needed
+  selector:
+    matchLabels:
+      app: notification-gateway
+  template:
+    metadata:
+      labels:
+        app: notification-gateway
+      annotations:
+        instrumentation.opentelemetry.io/inject-python: opentelemetry-operator-system/python-instrumentation      
+    spec:
+      containers:
+        - name: notification-gateway
+          image: shawnpitts/notification:latest
+          ports:
+            - containerPort: 5004
+          env:
+            - name: MONGO_USERNAME
+              value: "admin"
+            - name: MONGO_PASSWORD
+              value: "0gDB80h5iYxTFMnF"
+            - name: MONGO_CLUSTER
+              value: "autoshop.8tnzb06.mongodb.net"
+            - name: API_KEY
+              value: "e28e5ab6ef8c76b52efb915bc1dd8e6c"
+            - name: API_SECRET
+              value: "1e1cc18c3de46c8ab8f70ba1bb7e3087"
+            - name: SENDER_MAIL
+              value: "theautoshopapp@gmail.com"
+            - name: OTEL_SERVICE_NAME
+              value: notification
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: http://logzio-monitoring-otel-collector.monitoring.svc.cluster.local:4318
+
+              

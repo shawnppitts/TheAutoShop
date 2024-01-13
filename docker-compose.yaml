@@ -1,0 +1,60 @@
+version: '3'
+services:
+  portal:
+    container_name: portal
+    build:
+      context: ./PortalService
+    environment:
+      OM_GETORDER_URL: "/api/v1/orders/"
+      OM_SUBMITORDER_URL: "/api/v1/orders/submitOrder"
+      OM_PORT: "5003"
+      OM_BASEURL: "localhost"
+      PM_GETPRODUCT_URL: "/api/v1/products"
+      PM_PORT: "5002"
+      PM_BASEURL: "produc"
+      PYTHONUNBUFFERED: 1
+    ports:
+      - "5001:5001"
+    command: python3 app.py
+  
+  product:
+    container_name: product
+    build: 
+      context: ./ProductManagement
+    environment:
+      MONGO_USERNAME: "admin"
+      MONGO_PASSWORD: "0gDB80h5iYxTFMnF"
+      MONGO_CLUSTER: "autoshop.8tnzb06.mongodb.net"
+    ports:
+      - "5002:5002"
+    command: python3 app.py
+
+  orders:
+    container_name: orders
+    build: 
+      context: ./OrderManagement
+    environment:
+      MONGO_USERNAME: "admin"
+      MONGO_PASSWORD: "0gDB80h5iYxTFMnF"
+      MONGO_CLUSTER: "autoshop.8tnzb06.mongodb.net"
+      NG_URL: "/api/v1/email/sendMail"
+      NG_PORT: "5004"
+      NG_BASEURL: "localhost"
+    ports:
+      - "5003:5003"
+    command: python3 app.py
+
+  notification:
+    container_name: notification
+    build: 
+      context: ./notificationGateway
+    environment:
+      MONGO_USERNAME: "admin"
+      MONGO_PASSWORD: "0gDB80h5iYxTFMnF"
+      MONGO_CLUSTER: "autoshop.8tnzb06.mongodb.net"
+      API_KEY: "e28e5ab6ef8c76b52efb915bc1dd8e6c"
+      API_SECRET: "1e1cc18c3de46c8ab8f70ba1bb7e3087"
+      SENDER_MAIL: "theautoshopapp@gmail.com"
+    ports:
+      - "5004:5004"
+    command: python3 app.py

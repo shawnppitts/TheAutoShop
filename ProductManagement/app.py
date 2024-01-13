@@ -8,8 +8,8 @@ from flask_restx import Api, Resource, fields
 
 app = Flask(__name__)
 
-env_path = "./src/.env"
-load_dotenv(env_path)
+# env_path = "./src/.env"
+# load_dotenv(env_path)
 MONGO_PASSWORD = os.environ.get("MONGO_PASSWORD")
 MONGO_CLUSTER = os.environ.get("MONGO_CLUSTER")
 
@@ -118,4 +118,4 @@ except Exception as e:
 
 
 if __name__ == "__main__":
-    app.run(debug=True, port=5002)
+    app.run(port=5002, host="0.0.0.0")

@@ -9,8 +9,8 @@ from flask_restx import Api, Resource, fields
 
 app = Flask(__name__)
 
-env_path = "./src/.env"
-load_dotenv(env_path)
+# env_path = "./src/.env"
+# load_dotenv(env_path)
 MONGO_PASSWORD = os.environ.get("MONGO_PASSWORD")
 MONGO_CLUSTER = os.environ.get("MONGO_CLUSTER")
 
@@ -95,6 +95,7 @@ class Orders(Resource):
 
             # http://127.0.0.1:5004/api/v1/email/sendMail
             url = "http://" + os.getenv("NG_BASEURL") + ":" + os.getenv("NG_PORT") + os.getenv("NG_URL")
+            print(url)
             response = requests.post(url, json=requestData)
             return data, 200
         except Exception as e:
@@ -121,4 +122,4 @@ except Exception as e:
     print(e)
 
 if __name__ == "__main__":
-    app.run(debug=True,port=5003)
+    app.run(port=5003, host="0.0.0.0")

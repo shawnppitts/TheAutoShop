@@ -5,22 +5,19 @@ from flask import Flask, request, jsonify,render_template
 
 app = Flask(__name__)
 
-env_path = "./src/.env"
-load_dotenv(env_path)
-
+# env_path = "./src/.env"
+# load_dotenv(env_path)
 
 @app.route('/')
 @app.route('/home')
 def home():
     return render_template('home.html')
 
-
 @app.route('/order',methods=['GET','POST'])
 def order():
-    # http://127.0.0.1:5002/api/v1/products
     url = "http://" + os.getenv("PM_BASEURL") + ":" + os.getenv("PM_PORT") + os.getenv("PM_GETPRODUCT_URL")
+    print(url)
     response = requests.get(url).json()
-    print(response)
     if request.method == 'POST':
         data={}
         orderItems = []
@@ -49,16 +46,17 @@ def order():
         json_response = response.json()
         print(json_response)
         return render_template('orderView.html', data=response.json())
-    return render_template('order.html',data=response)
+    return render_template('order.html', data=response)
 
 @app.route('/viewOrder',methods=['GET','POST'])
 def viewOrder():
     if request.method == 'POST':
         orderId = request.form['orderId']
         url = "http://" + os.getenv("OM_BASEURL") + ":" + os.getenv("OM_PORT") + os.getenv("OM_GETORDER_URL") + orderId
+        print(url)
         response = requests.get(url).json()
         return render_template('orderView.html',data=response)
     return render_template('view.html')
 
 if __name__ == "__main__":
-    app.run(debug=True,port=5001)
+    app.run(port=5001, host="0.0.0.0")
