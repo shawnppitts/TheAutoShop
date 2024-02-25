@@ -1,16 +1,28 @@
 import os
 import uuid
 import requests
+import json
 from datetime import datetime
 from dotenv import load_dotenv
 from pymongo.mongo_client import MongoClient
 from flask import Flask, request
 from flask_restx import Api, Resource, fields
+from prometheus_client import make_wsgi_app, Gauge
+from werkzeug.middleware.dispatcher import DispatcherMiddleware
+
+import sys
+sys.path.append('../common/')
+import logger as logger
 
 app = Flask(__name__)
 
-# env_path = "./src/.env"
-# load_dotenv(env_path)
+# For promtheus exporting
+app.wsgi_app = DispatcherMiddleware(app.wsgi_app, {
+    '/metrics': make_wsgi_app()
+})
+
+env_path = "./src/.env"
+load_dotenv(env_path)
 MONGO_PASSWORD = os.environ.get("MONGO_PASSWORD")
 MONGO_CLUSTER = os.environ.get("MONGO_CLUSTER")
 
@@ -70,6 +82,7 @@ class Orders(Resource):
         try:
             db = client["db_om"]
             collection = db["orders"]
+            
             data = request.json
             data["id"] = uuid.uuid4().__str__()
             data["submittedAt"] = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
@@ -81,7 +94,6 @@ class Orders(Resource):
             for cost in data["orderItems"]:
                 totalCost += (cost["price"] * cost["quantity"]) + (cost["price"] * (cost["tax"])/100) * cost["quantity"]
             data["totalCost"] = totalCost
-            print(f"data: {data}")
             collection.insert_one(data)
             
             # SENDS EMAIL AFTER ORDER CREATED
@@ -91,14 +103,16 @@ class Orders(Resource):
             requestData["mailId"] = data["contact"]["emailId"]
             requestData["totalCost"] = data["totalCost"]
 
-            print(f"requestData: {requestData}")
-
             # http://127.0.0.1:5004/api/v1/email/sendMail
             url = "http://" + os.getenv("NG_BASEURL") + ":" + os.getenv("NG_PORT") + os.getenv("NG_URL")
-            print(url)
             response = requests.post(url, json=requestData)
             return data, 200
         except Exception as e:
+            log = {}
+            log["request_path"] = "/submitOrder"
+            log["method"] = "POST"
+            log["status"] = 500
+
             return f"Unexpected error: {e}", 500
 
 @order_ns.route("/<orderId>")
@@ -108,12 +122,32 @@ class ProductId(Resource):
         reponses={200: "Document Found", 404: "Document Not Found", 500: "Unexpected Error"},
     )
     def get(self, orderId):
-        print("hello")
-        return 200
+        try:
+            log = {}
+            db = client["db_om"]
+            collection = db["orders"]
+            
+            order_body = {}
+            order = collection.find_one({'id': orderId})
+            log["message"] = f"Found order with id: {orderId}"
+            log["request_path"] = "/orderId"
+            log["method"] = "GET"
 
-uri = f"mongodb+srv://admin:{MONGO_PASSWORD}@{MONGO_CLUSTER}/?retryWrites=true&w=majority"
+            order_body["orderItems"] = order["orderItems"]
+            order_body["contact"] = order["contact"]
+            order_body["orderId"] = orderId
+            order["submittedAt"] = order["submittedAt"]
+            order_body["totalCost"] = order["totalCost"]
+
+            log["details"] = order_body
+            log["status"] = 200
+            logger.log(log)
+            return order_body, 200
+        except Exception as e:
+            return f"Unexpected error: {e}", 500
 
 # Create a new client and connect to the server
+uri = f"mongodb+srv://admin:{MONGO_PASSWORD}@{MONGO_CLUSTER}/?retryWrites=true&w=majority"
 client = MongoClient(uri)
 try:
     client.admin.command('ping')

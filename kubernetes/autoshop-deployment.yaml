@@ -27,7 +27,7 @@ spec:
       protocol: TCP
       port: 4317
       targetPort: otlp
-  type: LoadBalancer
+  type: ClusterIP
 
 ---
 apiVersion: apps/v1
@@ -70,7 +70,12 @@ spec:
             - name: OTEL_SERVICE_NAME
               value: portal
             - name: OTEL_EXPORTER_OTLP_ENDPOINT
-              value: http://logzio-monitoring-otel-collector.monitoring.svc.cluster.local:4318    
+              value: http://logzio-monitoring-otel-collector.monitoring.svc.cluster.local:4318
+          resources:
+            limits:
+              memory: "150Mi"
+            requests:
+              memory: "150Mi"    
 
 # PRODUCT -----------------------------------------------------------------------
 ---
@@ -130,7 +135,12 @@ spec:
             - name: OTEL_SERVICE_NAME
               value: product
             - name: OTEL_EXPORTER_OTLP_ENDPOINT
-              value: http://logzio-monitoring-otel-collector.monitoring.svc.cluster.local:4318                            
+              value: http://logzio-monitoring-otel-collector.monitoring.svc.cluster.local:4318
+          resources:
+            limits:
+              memory: "150Mi"
+            requests:
+              memory: "150Mi"                                        
 
 # ORDER -----------------------------------------------------------------------
 ---
@@ -196,7 +206,12 @@ spec:
             - name: OTEL_SERVICE_NAME
               value: orders
             - name: OTEL_EXPORTER_OTLP_ENDPOINT
-              value: http://logzio-monitoring-otel-collector.monitoring.svc.cluster.local:4318                            
+              value: http://logzio-monitoring-otel-collector.monitoring.svc.cluster.local:4318
+          resources:
+            limits:
+              memory: "150Mi"
+            requests:
+              memory: "150Mi"                                         
 
 # Notification -----------------------------------------------------------------------
 ---
@@ -263,5 +278,10 @@ spec:
               value: notification
             - name: OTEL_EXPORTER_OTLP_ENDPOINT
               value: http://logzio-monitoring-otel-collector.monitoring.svc.cluster.local:4318
+          resources:
+            limits:
+              memory: "150Mi"
+            requests:
+              memory: "150Mi"              
 
               

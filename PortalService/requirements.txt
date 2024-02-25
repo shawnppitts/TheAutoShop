@@ -7,3 +7,5 @@ python-dotenv
 dnspython==2.0.0
 opentelemetry-exporter-otlp
 opentelemetry-distro
+prometheus-client
+uwsgi
