@@ -5,7 +5,7 @@ on:
 jobs:
   build-container:
     name: Build Docker container image
-    runs-on: python:3.8-slim-buster
+    runs-on: [self-hosted, macOS, X64]
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
