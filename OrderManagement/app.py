@@ -80,6 +80,7 @@ class Orders(Resource):
     @order_ns.marshal_with(order)
     def post(self):
         try:
+            total_cost_gauge = Gauge('product_count', 'Count of products')
             db = client["db_om"]
             collection = db["orders"]
             
@@ -93,7 +94,9 @@ class Orders(Resource):
             totalCost=0
             for cost in data["orderItems"]:
                 totalCost += (cost["price"] * cost["quantity"]) + (cost["price"] * (cost["tax"])/100) * cost["quantity"]
+            total_cost_gauge.set(totalCost)
             data["totalCost"] = totalCost
+
             collection.insert_one(data)
             
             # SENDS EMAIL AFTER ORDER CREATED
