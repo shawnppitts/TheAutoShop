@@ -21,22 +21,29 @@ jobs:
           for dir in "PortalService" "OrderManagement" "NotificationGateway" "ProductManagement";
           do
               # Check if the directory exists
-              if [ "$dir" == "ProductService" ]; then
+              if [ "$dir" == "PortalService" ]; then
                   echo "Building and Pushing image for $dir"
                   docker build -t portal .
+                  echo "Successfully built image"
                   docker push shawnpitts/portal:latest
+
               elif [ "$dir" == "ProductService" ]; then
                   echo "Building and Pushing image for $dir"
                   docker build -t product .
+                  echo "Successfully built image"
                   docker push shawnpitts/product:latest
+
               elif [ "$dir" == "OrderManagement" ]; then
                   echo "Building and Pushing image for $dir"
                   docker build -t order .
+                  echo "Successfully built image"
                   docker push shawnpitts/order:latest
+
               elif [ "$dir" == "NotificationGateway" ]; then
                   echo "Building image for $dir"
-                  docker build -t notify .
-                  docker push shawnpitts/notify:latest
+                  docker build -t notification .
+                  echo "Successfully built image"                  
+                  docker push shawnpitts/notification:latest
               fi
               cd ..
           done
