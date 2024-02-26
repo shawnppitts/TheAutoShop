@@ -7,10 +7,6 @@ from pymongo.mongo_client import MongoClient
 from flask_restx import Api, Resource, fields
 from mailjet_rest import Client
 
-import sys
-sys.path.append('../common/')
-import logger as logger
-
 app = Flask(__name__)
 
 env_path = "./src/.env"
@@ -97,7 +93,6 @@ class Email(Resource):
             response["status"] = "FAILURE"
             response["deliveredAt"] = None
 
-        logger.log(log)
         id = uuid.uuid4().__str__()
         response["id"] = id
         response["mailId"] = reqData["mailId"]
@@ -125,7 +120,6 @@ class Email(Resource):
                 doc["_id"] = str(doc["_id"])
                 products.append(doc)
             log["details"] = "products"
-            logger.log(log)
             return products, 200
         except Exception as e:
             return f"Unexpected error: {e}", 500
