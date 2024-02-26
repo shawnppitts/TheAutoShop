@@ -21,3 +21,21 @@ jobs:
         run: |
           docker build -t portal .
           docker push shawnpitts/portal:latest
+
+      - name: Build and deploy ProductManagement docker image
+        working-directory: ./ProductManagement
+        run: |
+          docker build -t product .
+          docker push shawnpitts/product:latest
+
+      - name: Build and deploy OrderManagement docker image
+        working-directory: ./OrderManagement
+        run: |
+          docker build -t order .
+          docker push shawnpitts/order:latest
+      
+      - name: Build and deploy NotificationGateway docker image
+        working-directory: ./NotificationGateway
+        run: |
+          docker build -t notification .
+          docker push shawnpitts/notification:latest                              
