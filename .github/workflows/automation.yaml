@@ -16,34 +16,8 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Build, Tag, and Push Docker Images
+      - name: Build and deploy PortalService docker image
+        working-directory: ./PortalService
         run: |
-          for dir in "PortalService" "OrderManagement" "NotificationGateway" "ProductManagement";
-          do
-              # Check if the directory exists
-              if [ "$dir" == "PortalService" ]; then
-                  echo "Building and Pushing image for $dir"
-                  docker build -t portal .
-                  echo "Successfully built image"
-                  docker push shawnpitts/portal:latest
-
-              elif [ "$dir" == "ProductService" ]; then
-                  echo "Building and Pushing image for $dir"
-                  docker build -t product .
-                  echo "Successfully built image"
-                  docker push shawnpitts/product:latest
-
-              elif [ "$dir" == "OrderManagement" ]; then
-                  echo "Building and Pushing image for $dir"
-                  docker build -t order .
-                  echo "Successfully built image"
-                  docker push shawnpitts/order:latest
-
-              elif [ "$dir" == "NotificationGateway" ]; then
-                  echo "Building image for $dir"
-                  docker build -t notification .
-                  echo "Successfully built image"                  
-                  docker push shawnpitts/notification:latest
-              fi
-              cd ..
-          done
+          docker build -t portal .
+          docker push shawnpitts/portal:latest
