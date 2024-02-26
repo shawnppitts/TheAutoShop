@@ -9,10 +9,7 @@ from flask import Flask, request
 from flask_restx import Api, Resource, fields
 from prometheus_client import make_wsgi_app, Gauge
 from werkzeug.middleware.dispatcher import DispatcherMiddleware
-
-import sys
-sys.path.append('../common/')
-import logger as logger
+from ..common.logger import log
 
 app = Flask(__name__)
 
@@ -111,10 +108,11 @@ class Orders(Resource):
             response = requests.post(url, json=requestData)
             return data, 200
         except Exception as e:
-            log = {}
-            log["request_path"] = "/submitOrder"
-            log["method"] = "POST"
-            log["status"] = 500
+            payload = {}
+            payload["request_path"] = "/submitOrder"
+            payload["method"] = "POST"
+            payload["status"] = 500
+            log(payload)
 
             return f"Unexpected error: {e}", 500
 
@@ -126,15 +124,15 @@ class ProductId(Resource):
     )
     def get(self, orderId):
         try:
-            log = {}
+            payload = {}
             db = client["db_om"]
             collection = db["orders"]
             
             order_body = {}
             order = collection.find_one({'id': orderId})
-            log["message"] = f"Found order with id: {orderId}"
-            log["request_path"] = "/orderId"
-            log["method"] = "GET"
+            payload["message"] = f"Found order with id: {orderId}"
+            payload["request_path"] = "/orderId"
+            payload["method"] = "GET"
 
             order_body["orderItems"] = order["orderItems"]
             order_body["contact"] = order["contact"]
@@ -142,9 +140,9 @@ class ProductId(Resource):
             order["submittedAt"] = order["submittedAt"]
             order_body["totalCost"] = order["totalCost"]
 
-            log["details"] = order_body
-            log["status"] = 200
-            logger.log(log)
+            payload["details"] = order_body
+            payload["status"] = 200
+            log(payload)
             return order_body, 200
         except Exception as e:
             return f"Unexpected error: {e}", 500

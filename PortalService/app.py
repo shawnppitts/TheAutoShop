@@ -5,10 +5,11 @@ import requests
 from flask import Flask, request, jsonify,render_template
 from prometheus_client import make_wsgi_app, Gauge
 from werkzeug.middleware.dispatcher import DispatcherMiddleware
+from ..common.logger import log
 
-import sys
-sys.path.append('../common/')
-import logger as logger
+# import sys
+# sys.path.append('../common/')
+# import logger as logger
 
 app = Flask(__name__)
 
@@ -27,7 +28,7 @@ def home():
  
 @app.route('/order',methods=['GET','POST'])
 def order():
-    log = {}
+    payload = {}
     url = "http://" + os.getenv("PM_BASEURL") + ":" + os.getenv("PM_PORT") + os.getenv("PM_GETPRODUCT_URL")
     response = requests.get(url).json()
     product_count = len(response)
@@ -38,7 +39,7 @@ def order():
     # POST request to submit order
     if request.method == 'POST':
 
-        log = {}
+        payload = {}
         data={}
         orderItems = []
         contact = {}
@@ -64,11 +65,11 @@ def order():
         response = requests.post(url, json=data)
         json_response = response.json()
 
-        log["message"] = f"Order data for item"
-        log["request_path"] = url
-        log["method"] = "POST"
-        log["details"] = json_response
-        logger.log(log)
+        payload["message"] = f"Order data for item"
+        payload["request_path"] = url
+        payload["method"] = "POST"
+        payload["details"] = json_response
+        log(payload)
 
         # POST passes details
         return render_template('orderView.html', data=response.json())
@@ -77,24 +78,24 @@ def order():
 
 @app.route('/viewOrder',methods=['GET','POST'])
 def viewOrder():
-    log = {}
+    payload = {}
     if request.method == 'POST':
-        log = {}
-        log["method"] = "POST"
+        payload = {}
+        payload["method"] = "POST"
         orderId = request.form['orderId']        
         url = "http://" + os.getenv("OM_BASEURL") + ":" + os.getenv("OM_PORT") + os.getenv("OM_GETORDER_URL") + orderId
         
         try:
             response = requests.get(url).json()
             print(response)
-            log["products"] = response
-            logger.log(log)
+            payload["products"] = response
+            log(payload)
             return render_template('orderView.html',data=response)
         except:
-            log["message"] = f"Could not find order with id: {orderId}"
-            log["status"] = 404
-            log["orderId"] = orderId
-            logger.log(log)
+            payload["message"] = f"Could not find order with id: {orderId}"
+            payload["status"] = 404
+            payload["orderId"] = orderId
+            log(payload)
             return render_template('home.html')
     return render_template('view.html')
 
