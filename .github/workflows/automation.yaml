@@ -34,7 +34,7 @@ jobs:
         working-directory: ./OrderManagement
         run: |
           docker build -t orders .
-          docker tag order shawnpitts/orders
+          docker tag orders shawnpitts/orders
           docker push shawnpitts/orders:latest
       
       - name: Push NotificationGateway Docker Image
