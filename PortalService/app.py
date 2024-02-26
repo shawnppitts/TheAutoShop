@@ -6,9 +6,13 @@ from flask import Flask, request, jsonify,render_template
 from prometheus_client import make_wsgi_app, Gauge
 from werkzeug.middleware.dispatcher import DispatcherMiddleware
 
-import sys
-sys.path.append('../')  # Add the parent directory to the system path
-from common.logger import log
+def log(message):
+  url = "https://listener.logz.io:8071?token=nAinGBdvDFnhzkvxkgypQfPHdSbtpJVD&type=autoshop"
+  payload = json.dumps(message)
+  headers = {
+    'Content-Type': 'application/json'
+  }
+  response = requests.request("POST", url, headers=headers, data=payload)
 
 app = Flask(__name__)
 
