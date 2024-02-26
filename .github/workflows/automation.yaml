@@ -16,26 +16,30 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Build and deploy PortalService docker image
+      - name: Push PortalService Docker Image
         working-directory: ./PortalService
         run: |
           docker build -t portal .
+          docker tag portal shawnpitts/portal
           docker push shawnpitts/portal:latest
 
-      - name: Build and deploy ProductManagement docker image
+      - name: Push ProductManagement Docker Image
         working-directory: ./ProductManagement
         run: |
           docker build -t product .
+          docker tag product shawnpitts/product
           docker push shawnpitts/product:latest
 
-      - name: Build and deploy OrderManagement docker image
+      - name: Push OrderManagement Docker Image
         working-directory: ./OrderManagement
         run: |
           docker build -t order .
+          docker tag order shawnpitts/order
           docker push shawnpitts/order:latest
       
-      - name: Build and deploy NotificationGateway docker image
+      - name: Push NotificationGateway Docker Image
         working-directory: ./NotificationGateway
         run: |
           docker build -t notification .
+          docker tag notification shawnpitts/notification
           docker push shawnpitts/notification:latest                              
