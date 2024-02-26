@@ -9,7 +9,10 @@ from flask import Flask, request
 from flask_restx import Api, Resource, fields
 from prometheus_client import make_wsgi_app, Gauge
 from werkzeug.middleware.dispatcher import DispatcherMiddleware
-from ..common.logger import log
+
+import sys
+sys.path.append('../')  # Add the parent directory to the system path
+from common.logger import log
 
 app = Flask(__name__)
 

@@ -5,11 +5,10 @@ import requests
 from flask import Flask, request, jsonify,render_template
 from prometheus_client import make_wsgi_app, Gauge
 from werkzeug.middleware.dispatcher import DispatcherMiddleware
-from ..common.logger import log
 
-# import sys
-# sys.path.append('../common/')
-# import logger as logger
+import sys
+sys.path.append('../')  # Add the parent directory to the system path
+from common.logger import log
 
 app = Flask(__name__)
 
@@ -32,6 +31,7 @@ def order():
     url = "http://" + os.getenv("PM_BASEURL") + ":" + os.getenv("PM_PORT") + os.getenv("PM_GETPRODUCT_URL")
     response = requests.get(url).json()
     product_count = len(response)
+    log(payload)
 
     product_gauge = Gauge('product_count', 'Count of products')
     product_gauge.set(product_count)
