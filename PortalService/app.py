@@ -31,6 +31,7 @@ def home():
  
 @app.route('/order',methods=['GET','POST'])
 def order():
+    print("/order")
     payload = {}
     url = "http://" + os.getenv("PM_BASEURL") + ":" + os.getenv("PM_PORT") + os.getenv("PM_GETPRODUCT_URL")
     response = requests.get(url).json()
