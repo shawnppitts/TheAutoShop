@@ -1,5 +1,6 @@
 import os
 import json
+import random
 from dotenv import load_dotenv
 import requests
 from flask import Flask, request, jsonify,render_template
@@ -34,10 +35,13 @@ def order():
     payload = {}
     url = "http://" + os.getenv("PM_BASEURL") + ":" + os.getenv("PM_PORT") + os.getenv("PM_GETPRODUCT_URL")
     response = requests.get(url).json()
+
     product_count = len(response)
     log(payload)
+    label_id = random.random()
 
     product_gauge = Gauge('product_count', 'Count of products')
+    product_gauge.labels(id=label_id)
     product_gauge.set(product_count)
     
     # POST request to submit order

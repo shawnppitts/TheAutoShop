@@ -1,0 +1,16 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: portal-service-monitor
+  namespace: app
+  labels:
+      release: prometheus
+spec:
+  jobLabel: portal
+  selector:
+    matchLabels:
+      app: portal
+  endpoints:
+  - port: portal-service
+    path: /metrics
+    interval: 15s
