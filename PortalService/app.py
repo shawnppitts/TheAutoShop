@@ -3,7 +3,7 @@ import json
 from dotenv import load_dotenv
 import requests
 from flask import Flask, request, jsonify,render_template
-from prometheus_client import make_wsgi_app, Gauge
+from prometheus_client import make_wsgi_app, Gauge, Counter, Histogram
 from werkzeug.middleware.dispatcher import DispatcherMiddleware
 
 def log(message):
@@ -24,14 +24,21 @@ app.wsgi_app = DispatcherMiddleware(app.wsgi_app, {
     '/metrics': make_wsgi_app()
 })
 
+request_counter = Counter(
+    'autoshop_request_count',
+    'Autoshop Request Count',
+    ['method', 'endpoint', 'status']
+)
+
 @app.route('/')
 @app.route('/home')
 def home():  
+    request_counter.labels('GET', '/', 200).inc(1)
     return render_template('home.html')
  
 @app.route('/order',methods=['GET','POST'])
 def order():
-    print("/order")
+    request_counter.labels('GET', '/order', 200).inc(1)
     payload = {}
     url = "http://" + os.getenv("PM_BASEURL") + ":" + os.getenv("PM_PORT") + os.getenv("PM_GETPRODUCT_URL")
     response = requests.get(url).json()
@@ -41,7 +48,7 @@ def order():
     
     # POST request to submit order
     if request.method == 'POST':
-
+        request_counter.labels('POST', '/order', 200).inc(1)
         payload = {}
         data={}
         orderItems = []
@@ -64,10 +71,17 @@ def order():
         data["orderItems"] = orderItems
         data["contact"] = contact
 
+
         url = "http://" + os.getenv("OM_BASEURL") + ":" + os.getenv("OM_PORT") + os.getenv("OM_SUBMITORDER_URL")
+        payload["message"] = f"pre submission to {url}"
+        payload["payload"] = json.dumps(data)
+        payload["contact"] = data["contact"]
+        log(payload)
+
         response = requests.post(url, json=data)
         json_response = response.json()
 
+        payload = {}
         payload["message"] = f"Order data for item"
         payload["request_path"] = url
         payload["method"] = "POST"
@@ -81,8 +95,10 @@ def order():
 
 @app.route('/viewOrder',methods=['GET','POST'])
 def viewOrder():
+    request_counter.labels('GET', '/viewOrder', 200).inc(1)
     payload = {}
     if request.method == 'POST':
+        request_counter.labels('POST', '/viewOrder', 200).inc(1)
         payload = {}
         payload["method"] = "POST"
         orderId = request.form['orderId']        
@@ -103,4 +119,4 @@ def viewOrder():
     return render_template('view.html')
 
 if __name__ == "__main__":
-    app.run(port=5001, host="0.0.0.0")
+    app.run(port=5001, host="0.0.0.0", debug=True)

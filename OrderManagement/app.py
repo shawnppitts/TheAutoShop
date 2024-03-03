@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 from pymongo.mongo_client import MongoClient
 from flask import Flask, request
 from flask_restx import Api, Resource, fields
-from prometheus_client import make_wsgi_app, Gauge
+from prometheus_client import make_wsgi_app, Gauge, Counter, Histogram
 from werkzeug.middleware.dispatcher import DispatcherMiddleware
 
 def log(message):
@@ -24,6 +24,19 @@ app = Flask(__name__)
 app.wsgi_app = DispatcherMiddleware(app.wsgi_app, {
     '/metrics': make_wsgi_app()
 })
+
+totalcost_counter = Counter(
+    'autoshop_total_spend',
+    'Autoshop Total spend across orders',
+    ['method', 'endpoint', 'status']
+)
+
+request_counter = Counter(
+    'autoshop_request_count',
+    'Autoshop Request Count',
+    ['method', 'endpoint', 'status']
+)
+
 
 env_path = "./src/.env"
 load_dotenv(env_path)
@@ -83,45 +96,40 @@ class Orders(Resource):
     @order_ns.expect(orderInsert, validate=True)
     @order_ns.marshal_with(order)
     def post(self):
-        try:
-            total_cost_gauge = Gauge('product_count', 'Count of products')
-            db = client["db_om"]
-            collection = db["orders"]
-            
-            data = request.json
-            data["id"] = uuid.uuid4().__str__()
-            data["submittedAt"] = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
-            orderId = uuid.uuid4().__str__()
-            # cb.upsert( os.getenv("ORDERID_KEY"), orderId.value+1)
-            orderId = "AUTO-"+str(orderId)
-            data["orderId"] = orderId
-            totalCost=0
-            for cost in data["orderItems"]:
-                totalCost += (cost["price"] * cost["quantity"]) + (cost["price"] * (cost["tax"])/100) * cost["quantity"]
-            total_cost_gauge.set(totalCost)
-            data["totalCost"] = totalCost
+        # Telemetry data initialization        
+        request_counter.labels('POST', '/submitOrder', 200).inc(1)
+        payload = {}
+        db = client["db_om"]
+        collection = db["orders"]
+        
+        data = request.json
+        payload["message"] = "Data pulled from /submitOrder"
+        payload["details"] = data
+        log(payload)
+        payload = {}
+        data["id"] = uuid.uuid4().__str__()
+        data["submittedAt"] = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+        orderId = uuid.uuid4().__str__()
+        orderId = "AUTO-"+str(orderId)
+        data["orderId"] = orderId
+        totalCost = 0
+        for cost in data["orderItems"]:
+            totalCost += (cost["price"] * cost["quantity"]) + (cost["price"] * (cost["tax"])/100) * cost["quantity"]
+        data["totalCost"] = totalCost            
+        totalcost_counter.labels('POST', '/submitOrder', 200).inc(totalCost)
 
-            collection.insert_one(data)
-            
-            # SENDS EMAIL AFTER ORDER CREATED
-            requestData={}
-            requestData["orderId"] = data["orderId"]
-            requestData["name"] = data["contact"]["name"]
-            requestData["mailId"] = data["contact"]["emailId"]
-            requestData["totalCost"] = data["totalCost"]
+        collection.insert_one(data)
+        # SENDS EMAIL AFTER ORDER CREATED
+        requestData={}
+        requestData["orderId"] = data["orderId"]
+        requestData["name"] = data["contact"]["name"]
+        requestData["mailId"] = data["contact"]["emailId"]
+        requestData["totalCost"] = data["totalCost"]
 
-            # http://127.0.0.1:5004/api/v1/email/sendMail
-            url = "http://" + os.getenv("NG_BASEURL") + ":" + os.getenv("NG_PORT") + os.getenv("NG_URL")
-            response = requests.post(url, json=requestData)
-            return data, 200
-        except Exception as e:
-            payload = {}
-            payload["request_path"] = "/submitOrder"
-            payload["method"] = "POST"
-            payload["status"] = 500
-            log(payload)
-
-            return f"Unexpected error: {e}", 500
+        # http://127.0.0.1:5004/api/v1/email/sendMail
+        url = "http://" + os.getenv("NG_BASEURL") + ":" + os.getenv("NG_PORT") + os.getenv("NG_URL")
+        response = requests.post(url, json=requestData)
+        return data, 200
 
 @order_ns.route("/<orderId>")
 class ProductId(Resource):
@@ -164,4 +172,4 @@ except Exception as e:
     print(e)
 
 if __name__ == "__main__":
-    app.run(port=5003, host="0.0.0.0")
+    app.run(port=5003, host="0.0.0.0", debug=True)
