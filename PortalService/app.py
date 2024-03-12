@@ -130,7 +130,7 @@ def viewOrder():
 
 if __name__ == "__main__":
     exporter = OTLPMetricExporter(
-        endpoint="http://0.0.0.0:4318/v1/metrics"
+        endpoint="http://logzio-monitoring-otel-collector.monitoring.svc.cluster.local:4318/v1/metrics"
     )
     otlp_reader = PeriodicExportingMetricReader(exporter)
     # console_reader = PeriodicExportingMetricReader(ConsoleMetricExporter())
