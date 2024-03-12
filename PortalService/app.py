@@ -40,6 +40,7 @@ request_counter = Counter(
 @app.route('/')
 @app.route('/home')
 def home():
+    # Add support for otel metrics
     autoshop_requests_counter.add(1, {"path": "/home"})
     request_counter.labels('GET', '/', 200).inc(1)
     return render_template('home.html')
