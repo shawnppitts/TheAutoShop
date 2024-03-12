@@ -40,8 +40,10 @@ request_counter = Counter(
 @app.route('/')
 @app.route('/home')
 def home():
+    print("hit endpoint /home")
     # Add support for otel metrics
     autoshop_requests_counter.add(1, {"path": "/home"})
+    print("metric counter +1")
     request_counter.labels('GET', '/', 200).inc(1)
     return render_template('home.html')
  
@@ -148,5 +150,6 @@ if __name__ == "__main__":
         description="number of requests",
         unit="1"
     )
+    print(autoshop_requests_counter)
     # controller = PushController(meter, collector_exporter, 10000)
     app.run(port=5001, host="0.0.0.0", debug=True)
