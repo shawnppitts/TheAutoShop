@@ -5,6 +5,13 @@ import requests
 from flask import Flask, request, jsonify,render_template
 from prometheus_client import make_wsgi_app, Gauge, Counter, Histogram
 from werkzeug.middleware.dispatcher import DispatcherMiddleware
+from opentelemetry import metrics
+from opentelemetry.sdk.metrics import MeterProvider
+from opentelemetry.exporter.otlp.proto.http.metric_exporter import OTLPMetricExporter
+from opentelemetry.sdk.metrics.export import (
+    PeriodicExportingMetricReader,
+    ConsoleMetricExporter
+)
 
 def log(message):
   url = "https://listener.logz.io:8071?token=nAinGBdvDFnhzkvxkgypQfPHdSbtpJVD&type=autoshop"
@@ -32,7 +39,8 @@ request_counter = Counter(
 
 @app.route('/')
 @app.route('/home')
-def home():  
+def home():
+    autoshop_requests_counter.add(1, {"path": "/home"})
     request_counter.labels('GET', '/', 200).inc(1)
     return render_template('home.html')
  
@@ -114,9 +122,30 @@ def viewOrder():
             payload["message"] = f"Could not find order with id: {orderId}"
             payload["status"] = 404
             payload["orderId"] = orderId
+            payload["log_level"] = "ERROR"
             log(payload)
             return render_template('home.html')
     return render_template('view.html')
 
 if __name__ == "__main__":
+    exporter = OTLPMetricExporter(
+        endpoint="http://0.0.0.0:4318/v1/metrics"
+    )
+    otlp_reader = PeriodicExportingMetricReader(exporter)
+    # console_reader = PeriodicExportingMetricReader(ConsoleMetricExporter())
+
+    otlp_provider = MeterProvider(metric_readers=[otlp_reader])
+    # console_provider = MeterProvider(metric_readers=[console_reader])
+
+    metrics.set_meter_provider(otlp_provider)
+    # metrics.set_meter_provider(console_provider)
+    # Creates a meter from the global meter provider
+    meter = metrics.get_meter("autoshop.meter")
+
+    autoshop_requests_counter = meter.create_counter(
+        name="autoshop_portal",
+        description="number of requests",
+        unit="1"
+    )
+    # controller = PushController(meter, collector_exporter, 10000)
     app.run(port=5001, host="0.0.0.0", debug=True)
