@@ -22,8 +22,8 @@ load_dotenv(env_path)
 MONGO_PASSWORD = os.environ.get("MONGO_PASSWORD")
 MONGO_CLUSTER = os.environ.get("MONGO_CLUSTER")
 
-senderMail = os.getenv("SENDER_MAIL")
-mailjet = Client(auth=(os.getenv("API_KEY"), os.getenv("API_SECRET")), version='v3.1')
+senderMail = os.getenv("MAILJET_SENDER_MAIL")
+mailjet = Client(auth=(os.getenv("MAILJET_API_KEY"), os.getenv("MAILJET_API_SECRET")), version='v3.1')
 api = Api(app)
 
 product_ns = api.namespace("api/v1/email", "Send Email")
