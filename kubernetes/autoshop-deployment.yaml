@@ -76,7 +76,7 @@ spec:
             - name: OTEL_SERVICE_NAME
               value: portal
             - name: OTEL_EXPORTER_OTLP_ENDPOINT
-              value: http://logzio-monitoring-otel-collector.monitoring.svc.cluster.local:4318
+              value: :4318
           resources:
             limits:
               memory: "150Mi"
@@ -133,15 +133,15 @@ spec:
             - containerPort: 5002
           env:
             - name: MONGO_USERNAME
-              value: "admin"
+              value: ""
             - name: MONGO_PASSWORD
-              value: "0gDB80h5iYxTFMnF"
+              value: ""
             - name: MONGO_CLUSTER
-              value: "autoshop.8tnzb06.mongodb.net"
+              value: ""
             - name: OTEL_SERVICE_NAME
               value: product
             - name: OTEL_EXPORTER_OTLP_ENDPOINT
-              value: http://logzio-monitoring-otel-collector.monitoring.svc.cluster.local:4318
+              value: :4318
           resources:
             limits:
               memory: "150Mi"
@@ -198,11 +198,11 @@ spec:
             - containerPort: 5003
           env:
             - name: MONGO_USERNAME
-              value: "admin"
+              value: "${MONGO_USER}"
             - name: MONGO_PASSWORD
-              value: "0gDB80h5iYxTFMnF"
+              value: "${MONGO_PW}"
             - name: MONGO_CLUSTER
-              value: "autoshop.8tnzb06.mongodb.net"
+              value: "${CLUSTER}"
             - name: NG_URL
               value: "/api/v1/email/sendMail"
             - name: NG_PORT
@@ -212,7 +212,7 @@ spec:
             - name: OTEL_SERVICE_NAME
               value: orders
             - name: OTEL_EXPORTER_OTLP_ENDPOINT
-              value: http://logzio-monitoring-otel-collector.monitoring.svc.cluster.local:4318
+              value: ${EXPORTER}:4318
           resources:
             limits:
               memory: "150Mi"
@@ -269,21 +269,21 @@ spec:
             - containerPort: 5004
           env:
             - name: MONGO_USERNAME
-              value: "admin"
+              value: ""
             - name: MONGO_PASSWORD
-              value: "0gDB80h5iYxTFMnF"
+              value: ""
             - name: MONGO_CLUSTER
-              value: "autoshop.8tnzb06.mongodb.net"
+              value: ""
             - name: API_KEY
-              value: "e28e5ab6ef8c76b52efb915bc1dd8e6c"
+              value: ""
             - name: API_SECRET
-              value: "1e1cc18c3de46c8ab8f70ba1bb7e3087"
+              value: ""
             - name: SENDER_MAIL
               value: "theautoshopapp@gmail.com"
             - name: OTEL_SERVICE_NAME
               value: notification
             - name: OTEL_EXPORTER_OTLP_ENDPOINT
-              value: http://logzio-monitoring-otel-collector.monitoring.svc.cluster.local:4318
+              value: :4318
           resources:
             limits:
               memory: "150Mi"
