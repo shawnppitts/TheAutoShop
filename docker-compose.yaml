@@ -22,9 +22,9 @@ services:
     build: 
       context: ./ProductManagement
     environment:
-      MONGO_USERNAME: "admin"
-      MONGO_PASSWORD: "0gDB80h5iYxTFMnF"
-      MONGO_CLUSTER: "autoshop.8tnzb06.mongodb.net"
+      MONGO_USERNAME: ${MONGO_USERNAME}
+      MONGO_PASSWORD: ${MONGO_PASSWORD}
+      MONGO_CLUSTER: ${MONGO_CLUSTER}
     ports:
       - "5002:5002"
     command: python3 app.py
@@ -34,9 +34,9 @@ services:
     build: 
       context: ./OrderManagement
     environment:
-      MONGO_USERNAME: "admin"
-      MONGO_PASSWORD: "0gDB80h5iYxTFMnF"
-      MONGO_CLUSTER: "autoshop.8tnzb06.mongodb.net"
+      MONGO_USERNAME: ${MONGO_USERNAME}
+      MONGO_PASSWORD: ${MONGO_PASSWORD}
+      MONGO_CLUSTER: ${MONGO_CLUSTER}
       NG_URL: "/api/v1/email/sendMail"
       NG_PORT: "5004"
       NG_BASEURL: "localhost"
@@ -49,12 +49,12 @@ services:
     build: 
       context: ./notificationGateway
     environment:
-      MONGO_USERNAME: "admin"
-      MONGO_PASSWORD: "0gDB80h5iYxTFMnF"
-      MONGO_CLUSTER: "autoshop.8tnzb06.mongodb.net"
-      API_KEY: "e28e5ab6ef8c76b52efb915bc1dd8e6c"
-      API_SECRET: "1e1cc18c3de46c8ab8f70ba1bb7e3087"
-      SENDER_MAIL: "theautoshopapp@gmail.com"
+      MONGO_USERNAME: ${MONGO_USERNAME}
+      MONGO_PASSWORD: ${MONGO_PASSWORD}
+      MONGO_CLUSTER: ${MONGO_CLUSTER}
+      API_KEY: ${API_KEY}
+      API_SECRET: ${API_SECRET}
+      SENDER_MAIL: ${SENDER_MAIL}
     ports:
       - "5004:5004"
     command: python3 app.py

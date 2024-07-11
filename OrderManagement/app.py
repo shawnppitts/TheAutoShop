@@ -97,7 +97,6 @@ class Orders(Resource):
         data = request.json
         payload["message"] = "Data pulled from /submitOrder"
         payload["details"] = data
-        log(payload)
         payload = {}
         data["id"] = uuid.uuid4().__str__()
         data["submittedAt"] = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
@@ -149,7 +148,6 @@ class ProductId(Resource):
 
             payload["details"] = order_body
             payload["status"] = 200
-            log(payload)
             return order_body, 200
         except Exception as e:
             return f"Unexpected error: {e}", 500

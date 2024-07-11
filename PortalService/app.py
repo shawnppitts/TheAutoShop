@@ -46,9 +46,7 @@ def order():
     url = "http://" + os.getenv("PM_BASEURL") + ":" + os.getenv("PM_PORT") + os.getenv("PM_GETPRODUCT_URL")
     response = requests.get(url).json()
 
-    product_count = len(response)
-    log(payload)
-    
+    product_count = len(response)    
     # POST request to submit order
     if request.method == 'POST':
         request_counter.labels('POST', '/order', 200).inc(1)
@@ -79,7 +77,6 @@ def order():
         payload["message"] = f"pre submission to {url}"
         payload["payload"] = json.dumps(data)
         payload["contact"] = data["contact"]
-        log(payload)
 
         response = requests.post(url, json=data)
         json_response = response.json()
@@ -89,7 +86,6 @@ def order():
         payload["request_path"] = url
         payload["method"] = "POST"
         payload["details"] = json_response
-        log(payload)
 
         # POST passes details
         return render_template('orderView.html', data=response.json())
@@ -111,14 +107,12 @@ def viewOrder():
             response = requests.get(url).json()
             print(response)
             payload["products"] = response
-            log(payload)
             return render_template('orderView.html',data=response)
         except:
             payload["message"] = f"Could not find order with id: {orderId}"
             payload["status"] = 404
             payload["orderId"] = orderId
             payload["log_level"] = "ERROR"
-            log(payload)
             return render_template('home.html')
     return render_template('view.html')
 

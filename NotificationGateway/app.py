@@ -7,14 +7,6 @@ from pymongo.mongo_client import MongoClient
 from flask_restx import Api, Resource, fields
 from mailjet_rest import Client
 
-def log(message):
-  url = "https://listener.logz.io:8071?token=nAinGBdvDFnhzkvxkgypQfPHdSbtpJVD&type=autoshop"
-  payload = json.dumps(message)
-  headers = {
-    'Content-Type': 'application/json'
-  }
-  response = requests.request("POST", url, headers=headers, data=payload)
-
 app = Flask(__name__)
 
 env_path = "./src/.env"
